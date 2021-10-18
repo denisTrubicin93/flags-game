@@ -1,0 +1,863 @@
+/*
+ * @NOTE: Prepend a `~` to css file paths that are in your node_modules
+ *        See https://github.com/webpack-contrib/sass-loader#imports
+ */
+
+ @font-face {
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: 100;
+  src: local("Roboto Thin"), local("Roboto-Thin"),
+    url("./fonts/roboto/Roboto-Thin.woff2") format("woff2"),
+    url("./fonts/roboto/Roboto-Thin.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Roboto Condensed";
+  font-style: normal;
+  font-weight: 300;
+  src: local("Roboto Condensed Light"), local("RobotoCondensed-Light"),
+    url("./fonts/roboto-condensed/Roboto-Condensed-Light.woff2") format("woff2"),
+    url("./fonts/roboto-condensed/Roboto-Condensed-Light.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Roboto Condensed";
+  font-style: normal;
+  font-weight: 400;
+  src: local("Roboto Condensed"), local("RobotoCondensed-Regular"),
+    url("./fonts/roboto-condensed/Roboto-Condensed-Regular.woff2")
+      format("woff2"),
+    url("./fonts/roboto-condensed/Roboto-Condensed-Regular.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Roboto Condensed";
+  font-style: normal;
+  font-weight: 700;
+  src: local("Roboto Condensed Bold"), local("RobotoCondensed-Bold"),
+    url("./fonts/roboto-condensed/Roboto-Condensed-Bold.woff2") format("woff2"),
+    url("./fonts/roboto-condensed/Roboto-Condensed-Bold.woff") format("woff");
+}
+
+@font-face {
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: 400;
+  src: local("Roboto"), local("Roboto-Regular"),
+    url("./fonts/roboto/Roboto-Regular.woff2") format("woff2"),
+    url("./fonts/roboto/Roboto-Regular.woff") format("woff");
+}
+
+@font-face {
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: 500;
+  src: local("Roboto Medium"), local("Roboto-Medium"),
+    url("./fonts/roboto/Roboto-Medium.woff2") format("woff2"),
+    url("./fonts/roboto/Roboto-Medium.woff") format("woff");
+}
+
+@font-face {
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: 700;
+  src: local("Roboto Bold"), local("Roboto-Bold"),
+    url("./fonts/roboto/Roboto-Bold.woff2") format("woff2"),
+    url("./fonts/roboto/Roboto-Bold.woff") format("woff");
+}
+
+@font-face {
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: 300;
+  src: local("Roboto Light"), local("Roboto-Light"),
+    url("./fonts/roboto/Roboto-Light.woff2") format("woff2"),
+    url("./fonts/roboto/Roboto-Light.woff") format("woff");
+}
+
+
+ html {
+  cursor: none;
+}
+
+body {
+  height: 100%;
+  width: 100%;
+  background: #000;
+  color: #fff;
+  font-family: "Roboto Condensed", sans-serif;
+  font-weight: 400;
+  font-size: 2em;
+  line-height: 1.5em;
+  -webkit-font-smoothing: antialiased;
+  margin: 0;
+  overflow: hidden; /* Hide scrollbars */
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+/**
+ * Default styles.
+ */
+.margin-top-230 {
+  margin-top: 240px;
+}
+
+.HeartBeatBar {
+  background : linear-gradient(to bottom,
+                               red,
+                               orange,
+                               yellow,
+                               green,
+                               aqua,
+                               blue);
+  border-radius: 1rem;
+  position: fixed;
+}
+
+.margin-bot-110{
+  margin-bottom: 110px;
+}
+
+.padding-left-48{
+padding-left: 48px;
+}
+
+.calorie-fire1{
+  position: fixed;
+  margin-top: 10px;
+  margin-left: 5px;
+}
+
+.calorie-fire2{
+  z-index: -1;
+}
+
+.rectangle {
+  width: 20px;
+  height: 10px;
+  border: medium solid  rgb(12, 3, 3);
+  background-color: rgba(0,0,0,0);
+  border-radius: 1rem;
+}
+
+ .progress {
+  background-color: rgb(161, 161, 161);
+  width: 20px;
+  transition: 1s ease;
+  transition-delay: 0.25s;
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+  border-bottom-left-radius: -0.5rem;
+  border-bottom-right-radius: -0.5rem;
+}
+
+.progress-cover{
+  background-color: rgb(121, 121, 121);
+  border-radius: 1rem;
+}
+
+.progress-div {
+  background-color: rgb(255, 255, 255);
+  border-radius: 1rem;
+}
+
+.dimmed {
+  color: #666;
+}
+
+.normal {
+  color: #999;
+}
+
+.bright {
+  color: #fff;
+}
+
+.width-20{
+  width: 20px;
+}
+
+.xsmall {
+  font-size: 15px;
+  line-height: 20px;
+}
+
+.small {
+  font-size: 20px;
+  line-height: 25px;
+}
+
+.medium {
+  font-size: 30px;
+  line-height: 35px;
+}
+
+.xmedium {
+  font-size: 50px;
+  line-height: 50px;
+}
+
+.large {
+  font-size: 65px;
+  line-height: 65px;
+}
+
+.xlarge {
+  font-size: 75px;
+  line-height: 75px;
+  letter-spacing: -3px;
+}
+
+.padding-25{
+  padding-top: 25px;
+}
+
+.thin {
+  font-family: Roboto, sans-serif;
+  font-weight: 100;
+}
+
+.light {
+  font-family: "Roboto Condensed", sans-serif;
+  font-weight: 300;
+}
+
+.regular {
+  font-family: "Roboto Condensed", sans-serif;
+  font-weight: 400;
+}
+
+.bold {
+  font-family: "Roboto Condensed", sans-serif;
+  font-weight: 700;
+}
+
+.align-right {
+  text-align: right;
+}
+
+.align-left {
+  text-align: left;
+}
+
+.full-width{
+  width: 100%;
+}
+
+.align-center {
+  align-items: center;
+}
+
+header {
+  text-transform: uppercase;
+  font-size: 15px;
+  font-family: "Roboto Condensed", Arial, Helvetica, sans-serif;
+  font-weight: 400;
+  border-bottom: 1px solid #666;
+  line-height: 15px;
+  padding-bottom: 5px;
+  margin-bottom: 10px;
+  color: #999;
+}
+
+sup {
+  font-size: 50%;
+  line-height: 50%;
+}
+
+/**
+ * Module styles.
+ */
+
+.module {
+  margin-bottom: 30px;
+}
+
+.region.bottom .module {
+  margin-top: 30px;
+  margin-bottom: 0;
+}
+
+.no-wrap {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pre-line {
+  white-space: pre-line;
+}
+
+/**
+ * Region Definitions.
+ */
+
+.region {
+  position: absolute;
+}
+
+.region.fullscreen {
+  position: absolute;
+  top: -60px;
+  left: -60px;
+  right: -60px;
+  bottom: -60px;
+  pointer-events: none;
+}
+
+.region.fullscreen * {
+  pointer-events: auto;
+}
+
+.region.right {
+  right: 0;
+  text-align: right;
+}
+
+.region.top {
+  top: 0;
+}
+
+.region.top .container {
+  margin-bottom: 25px;
+}
+
+.region.bottom .container {
+  margin-top: 25px;
+}
+
+.region.top .container:empty {
+  margin-bottom: 0;
+}
+
+.region.top.center,
+.region.bottom.center {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.region.top.right,
+.region.top.left,
+.region.top.center {
+  top: 100%;
+}
+
+.region.bottom {
+  bottom: 0;
+}
+
+.region.bottom .container:empty {
+  margin-top: 0;
+}
+
+.region.bottom.right,
+.region.bottom.center,
+.region.bottom.left {
+  bottom: 100%;
+}
+
+.region.bar {
+  width: 100%;
+  text-align: center;
+}
+
+.region.third,
+.region.middle.center {
+  width: 100%;
+  text-align: center;
+  transform: translateY(-50%);
+}
+
+.region.upper.third {
+  top: 33%;
+}
+
+.region.middle.center {
+  top: 50%;
+}
+
+.region.lower.third {
+  top: 66%;
+}
+
+.region.left {
+  text-align: left;
+}
+
+.region table {
+  width: 100%;
+  border-spacing: 0;
+  border-collapse: separate;
+}
+
+.containar {
+  text-align: center;
+}
+
+.fadeOut {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  transition: width 0.5s 0.5s, height 0.5s 0.5s, opacity 0.5s;
+}
+.fadeIn {
+  opacity: 1;
+  width: 100px;
+  height: 100px;
+  transition: width 0.5s, height 0.5s, opacity 0.5s 0.5s;
+}
+
+.containar {
+  height: Calc(100vh - 24px);
+  width: Calc(100vw - 40px);
+  padding: 24px;
+  overflow: hidden;
+}
+
+.max-height {
+  height: 100vh;
+}
+
+.mid-height {
+  height: 50vh;
+}
+
+.height-200 {
+  height: 200px;
+}
+
+.height-100 {
+  height: 100px;
+}
+
+.scroll {
+  overflow: scroll;
+}
+
+.action-button_simuration {
+  width: 100%;
+  /* background-color: rgba(255, 255, 255, 0.2) !important; */
+  color: #fff !important;
+  font-weight: bold !important;
+  font-size: 0.8em !important;
+}
+
+.simuration_icon {
+  padding-right: 5px;;
+}
+
+.side {
+  height: 100%;
+  /* padding-bottom: 50px; */
+}
+
+.MuiCardHeader-content .MuiCardHeader-subheader {
+  color: #fff;
+  font-weight: bold;
+}
+
+.section h2 {
+  border-left: hotpink solid 5px;
+  padding-left: 5px;
+}
+
+.action-button {
+  width: 50%;
+  /* background-color: rgba(255, 255, 255, 0.2) !important; */
+  color: #fff !important;
+  font-weight: bold !important;
+  font-size: 1em !important;
+}
+
+
+.action-button_stuff {
+  width: 100%;
+  /* background-color: rgba(255, 255, 255, 0.2) !important; */
+  color: #fff !important;
+  font-weight: bold !important;
+  font-size: 0.8em !important;
+}
+
+.next-store_icon {
+  padding-right: 5px;
+}
+
+.MuiDialog-paper {
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.8) !important;
+  padding: 30px;
+  color: #fff !important;
+}
+
+.MuiCardHeader-content .MuiCardHeader-subheader {
+  color: #fff;
+  font-weight: bold;
+}
+
+.section h2 {
+  border-left: lightskyblue solid 5px;
+  padding-left: 5px;
+}
+
+.action-button {
+  width: 100%;
+  /* background-color: rgba(255, 255, 255, 0.2) !important; */
+  color: #fff !important;
+  font-weight: bold !important;
+  font-size: 1em !important;
+}
+
+.action-button-situation {
+  width: 20%;
+  /* background-color: rgba(255, 255, 255, 0.2) !important; */
+  color: #fff !important;
+  font-weight: bold !important;
+  font-size: 17px !important;
+  border: white solid 3px !important;
+  margin: 2px !important;
+}
+
+.button-grid-situation{
+  display: inline-flex;
+}
+
+.action-button-situation2 {
+  width: 100%;
+  /* background-color: rgba(255, 255, 255, 0.2) !important; */
+  color: #fff !important;
+  font-weight: bold !important;
+  font-size: 17px !important;
+  border: white solid 3px !important;
+}
+
+.action-button-situation3 {
+  width: 225px;
+  /* background-color: rgba(255, 255, 255, 0.2) !important; */
+  color: #fff !important;
+  font-weight: bold !important;
+  font-size: 17px !important;
+  border: white solid 1px !important;
+}
+
+.color-white{
+  color: white;
+}
+
+.color-lightgrey{
+  color: rgb(161, 161, 161);
+}
+
+.MuiCardHeader-content .MuiCardHeader-subheader {
+  color: #fff;
+}
+
+.action-button {
+  width: 100%;
+  color: #fff !important;
+  font-weight: bold !important;
+  font-size: 32px !important;
+}
+
+.action-plan-button {
+  width: 100%;
+  color: #fff !important;
+  font-weight: bold !important;
+  font-size: 24px !important;
+}
+
+.action-button.selected {
+  border: white solid 3px !important;
+}
+
+.action-button.non-selected {
+  border: black solid 3px !important;
+}
+
+.action-button-situation2.non-selected{
+  border: black solid 3px !important;
+}
+
+.action-button-situation.non-selected{
+  border: black solid 3px !important;
+}
+
+.fee {
+  font-weight: bold;
+  font-size: 24px;
+}
+
+.fee-title {
+  font-size: 24px;
+}
+
+.guarantee {
+  text-align: left;
+  font-size: 12px;
+  margin: 0;
+  line-height: 1.0em;
+}
+.guarantee th{
+  background-color: rgba(255,255,255, 0.2) !important;
+}
+.guarantee .red{
+  font-size: 18px;
+  font-weight: bold;
+  color: red;
+}
+
+.guarantee .header{
+  width: 10px;
+}
+
+.guarantee .conditions {
+  padding: 3px;
+  background-color: rgba(255,255,255, 0.3) !important;
+}
+
+
+.main-footer {
+  height: 200px;
+}
+
+.footer{
+padding: 1rem;
+background-color:black;
+position: fixed;
+bottom: 0;
+left: 0;
+width: 100%;
+}
+
+.main-content {
+  height: calc(100vh - 250px);
+}
+
+.app-exit {
+  position: absolute;
+  left:50;
+  top:0;
+  z-index: 9999;
+}
+
+.action-button_exit {
+  width: 100%;
+  /* background-color: rgba(255, 255, 255, 0.2) !important; */
+  color: #333333 !important;
+  font-weight: bold !important;
+  font-size: 0.8em !important;
+}
+
+
+.ReactPiano__Keyboard {
+  /* Used for absolute positioning of .ReactPiano__Key--accidental elements */
+  position: relative;
+  /* Used to lay out .ReactPiano__Key--natural elements */
+  display: flex;
+}
+
+.ReactPiano__Key {
+  /* Used for flexbox layout of the child .ReactPiano__NoteLabelContainer elements */
+  display: flex;
+}
+
+/*
+ * Styles of accidental notes (flat or sharp)
+ */
+.ReactPiano__Key--accidental {
+  background: #555;
+  border: 1px solid #fff;
+  border-top: 1px solid transparent;
+  border-radius: 0 0 4px 4px;
+  cursor: pointer;
+  height: 66%;
+  /* Overlay on top of natural keys */
+  z-index: 1;
+  /* Use absolute positioning along with inline styles specified in JS to put keys in correct locations. */
+  position: absolute;
+  top: 0;
+}
+
+/*
+ * Styles of natural notes (white keys)
+ */
+.ReactPiano__Key--natural {
+  background: #f6f5f3;
+  border: 1px solid #888;
+  border-radius: 0 0 6px 6px;
+  cursor: pointer;
+  z-index: 0;
+  /*
+   * Uses flexbox with margin instead of absolute positioning to have more consistent margin rendering.
+   * This causes inline styles to be ignored.
+   */
+  flex: 1;
+  margin-right: 1px;
+}
+
+.ReactPiano__Key--natural:last-child {
+  /* Don't render extra margin on the last natural note */
+  margin-right: 0;
+}
+
+/*
+ * Styles of "active" or pressed-down keys
+ */
+.ReactPiano__Key--active {
+  background: #3ac8da;
+}
+
+.ReactPiano__Key--active.ReactPiano__Key--accidental {
+  border: 1px solid #fff;
+  border-top: 1px solid #3ac8da;
+  /* Slight height reduction for "pushed-down" effect */
+  height: 65%;
+}
+
+.ReactPiano__Key--active.ReactPiano__Key--natural {
+  border: 1px solid #3ac8da;
+  /* Slight height reduction for "pushed-down" effect */
+  height: 98%;
+}
+
+/*
+ * Styles for disabled state
+ */
+.ReactPiano__Key--disabled.ReactPiano__Key--accidental {
+  background: #ddd;
+  border: 1px solid #999;
+}
+
+.ReactPiano__Key--disabled.ReactPiano__Key--natural {
+  background: #eee;
+  border: 1px solid #aaa;
+}
+
+/*
+ * Styles for the note label inside a piano key
+ */
+.ReactPiano__NoteLabelContainer {
+  flex: 1;
+  /* Align children .ReactPiano__NoteLabel to the bottom of the key */
+  align-self: flex-end;
+}
+
+.ReactPiano__NoteLabel {
+  font-size: 12px;
+  text-align: center;
+  text-transform: capitalize;
+  /* Disable text selection */
+  user-select: none;
+}
+
+.ReactPiano__NoteLabel--accidental {
+  color: #f8e8d5;
+  margin-bottom: 3px;
+}
+
+.ReactPiano__NoteLabel--natural {
+  color: #888;
+  margin-bottom: 3px;
+}
+
+.ReactPiano__NoteLabel--natural.ReactPiano__NoteLabel--active {
+  color: #f8e8d5;
+}
+.number {
+  font-family: IBM Plex Sans;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 96px;
+  line-height: 100%;
+  color: #FFFFFF;
+}
+.text {
+  font-family: IBM Plex Sans;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 40px;
+  line-height: 110%;
+  color: #FFFFFF;
+  opacity: 0.5;
+}
+.font{
+  font-family: IBM Plex Sans;
+  font-style: normal;
+  font-weight: normal;
+}
+.xlargeFont {
+  font-size: 160px;
+  line-height: 100%;
+}
+.largeFont {
+  font-size: 96px;
+  line-height: 110%;
+}
+.xmediumFont {
+  font-size: 64px;
+  line-height: 90%;
+}
+.mediumFont {
+  font-size: 40px;
+  line-height: 100%;
+}
+.smallFont{
+  font-size: 32px;
+  line-height: 100%;
+}
+.xsmallFont{
+  font-size: 24px;
+  line-height: 100%;
+}
+.padding-21{
+  padding-top: 25px;
+}
+.padding-16{
+  padding-top: 16px;
+}
+.padding-24{
+  padding-top: 24px;
+}
+.topNav {
+  margin: 24px;
+}
+.topNavLeft {
+  margin-left: 56px;
+}
+
+@keyframes arrow-up {
+  from {
+    transform: translateY(-40%) scaleY(2);
+  }
+  to {
+    transform: translateY(-70%) scaleY(2);
+  }
+}
+
+@keyframes scaleInOut{
+  0%{
+    transform: translate(-50%, -50%) scale(0);
+  }
+  30%{
+    transform: translate(-50%, -50%) scale(1);
+  }
+  70%{
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100%{
+    transform: translate(-50%, -50%) scale(0);
+  }
+}
+
+@keyframes fadeIn{
+  0%{
+    opacity: 0;
+  }
+  100%{
+    opacity: 1;
+  }
+}

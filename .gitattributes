@@ -1,0 +1,20 @@
+*       text    eol=lf
+*.exe   binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.ico   binary
+*.icns  binary
+*.gif   binary
+*.blob  binary
+*.glb   binary
+*.mp3   binary
+*.gltf  binary
+*.mp4   binary
+*.wav   binary
+*.otf   binary
+*.eot   binary
+*.ttf   binary
+*.woff  binary
+*.woff2 binary
+*.unityweb binary

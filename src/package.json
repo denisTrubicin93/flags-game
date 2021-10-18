@@ -1,0 +1,18 @@
+{
+  "name": "smart-mirror-x",
+  "productName": "smart-mirror-x",
+  "version": "0.1.18",
+  "description": "smart mirror x",
+  "main": "./main.prod.js",
+  "author": {
+    "name": "smart mirror x",
+    "email": "mirror@xenera.jp",
+    "url": "https://xenera.jp"
+  },
+  "scripts": {
+    "electron-rebuild": "node -r ../.erb/scripts/BabelRegister.js ../.erb/scripts/ElectronRebuild.js",
+    "postinstall": "yarn electron-rebuild"
+  },
+  "license": "MIT",
+  "dependencies": {}
+}
