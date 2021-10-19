@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/alt-text */
 import React, { useCallback, useEffect, useState } from 'react';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
@@ -23,7 +24,6 @@ import { getPose } from '../../features/Exercise/reducer';
 import { ButtonPoint } from '../../features/Button/models';
 import { setBtnPoint } from '../../features/Button/reducer';
 
-import TEST from './assets/flags/voiceover/beep.mp3';
 import RandW_DownVoice from './assets/flags/voiceover/red&white_down.mp3';
 import RandW_NotDownVoice from './assets/flags/voiceover/red&white_NO_down.mp3';
 import RandW_UpVoice from './assets/flags/voiceover/red&white_up.mp3';
@@ -61,6 +61,7 @@ import CounterBG from './assets/flags/counterBackground.png';
 import arrowUp from './assets/flags/arrow-up.png';
 import readyText from './assets/flags/are-you-ready.png';
 import roundPng from './assets/flags/round.png';
+import thinkPng from './assets/flags/think.png';
 
 import EllipseBack from './assets/squat/ellipse_back.png';
 import EllipseFoot from './assets/squat/ellipse_foot.png';
@@ -182,6 +183,19 @@ const useStyles = makeStyles((theme: Theme) =>
         left: 50%;
         top: 50%;
         transform:translate(-50%,-50%);
+      `,
+      '& .avatar-distracts': `
+        display: flex;
+        justify-content: space-between;
+        position: absolute;
+        width: 1080px;
+        height: 400px;
+        left: 50%;
+        top: 60%;
+        transform:translate(-50%,-50%);
+      `,
+      '& .avatar-distracts img': `
+        width: 400px;
       `,
       '& .game_avatar .ready': `
         position: absolute;
@@ -322,6 +336,18 @@ export default function GamePlayFlags() {
   const classes = useStyles();
   const history = useHistory();
   const dispatch = useDispatch();
+  const listImagesFlags = [
+    RedUp,
+    RedDown,
+    WhiteUp,
+    WhiteDown,
+    TopRedUp,
+    TopRedDown,
+    TopWhiteUp,
+    TopWhiteDown,
+    FlagsUp,
+    FlagsDown,
+  ];
   const textCommands = {
     red_up: '赤上げて',
     white_up: '白上げて',
@@ -429,8 +455,10 @@ export default function GamePlayFlags() {
   const [fail, setFail] = useState();
   const [image, setImage] = useState(roundPng);
   const [rndCommand, setRndCommand] = useState('');
+  const [rndColorText, setRndColorText] = useState(2);
   const [startGame, setStartGame] = useState(false);
-  // const [selectionCommand, setSelectionCommand] = useState([]);
+  const [think, setThink] = useState(false);
+  const [avatarDistracts, setAvatarDistracts] = useState<any>(null);
 
   const addCounteProgress = () => {
     if (textCommand === 'Game Over') return;
@@ -442,6 +470,7 @@ export default function GamePlayFlags() {
   const commandChange = (cm) => {
     if (seconds >= 2) {
       setTimeout(() => {
+        setThink(false);
         // const rndCommand = cm[Math.floor(Math.random() * cm.length)];
         setRndCommand(() => {
           let rnd = cm[Math.floor(Math.random() * cm.length)];
@@ -473,6 +502,11 @@ export default function GamePlayFlags() {
 
   useEffect(() => {
     if (!startGame) return;
+    setTimeout(() => {
+      setThink(true);
+    }, 1000);
+    if (round === 2) setRndColorText(() => Math.round(Math.random()));
+    else setRndColorText(() => 0);
     setTextCommand(() => rndCommand);
     if (
       rndCommand === textCommands.red_not_up ||
@@ -500,9 +534,9 @@ export default function GamePlayFlags() {
   }, [rndCommand]);
 
   useEffect(() => {
-      if (counteProgress > maxProgress[round - 1])
-        setPoints(() => Points + round + 1)
-      else setPoints(() => Points + round);
+    if (counteProgress > maxProgress[round - 1])
+      setPoints(() => Points + round + 1);
+    else setPoints(() => Points + round);
   }, [counteProgress]);
 
   const tick = useCallback(() => {
@@ -528,9 +562,11 @@ export default function GamePlayFlags() {
         setFail(true);
         return;
       }
+      setThink(false);
       setStartGame(false);
       setTextCommand(() => '');
-      // setImage(() => FlagStart);
+      setWhiteFlag(() => 'down');
+      setRedFlag(() => 'down');
       setCounteProgress(() => 0);
       setSeconds(() => 20);
       setRound(() => round + 1);
@@ -581,32 +617,44 @@ export default function GamePlayFlags() {
     setImage(() => roundPng);
     setTimeout(() => {
       setImage(() => FlagStart);
-      dispatch(
-        sendMessageAction({
-          to: 'pose',
-          message: {
-            cmd: 'flag_restart',
-            result: { event: 'flag', result: 2, score: 0.4, image: 'base64ed' },
-          },
-        })
-      );
+      // dispatch(
+      //   sendMessageAction({
+      //     to: 'pose',
+      //     message: {
+      //       cmd: 'flag_restart',
+      //       result: { event: 'flag', result: 2, score: 0.4, image: 'base64ed' },
+      //     },
+      //   })
+      // );
     }, 2000);
   }, [round]);
   useEffect(() => {
-    const timer = setInterval(() => {
-      dispatch(
-        sendMessageAction({
-          to: 'pose',
-          message: {
-            cmd: 'flag_restart',
-            result: { event: 'flag', result: 0, score: 0.4, image: 'base64ed' },
-          },
-        })
-      );
-    }, 1000);
+    const avatarInterval = setInterval(() => {
+      setAvatarDistracts(() => {
+        return {
+          number: Math.round(Math.random()),
+          image:
+            listImagesFlags[
+              Math.round(Math.random() * listImagesFlags.length - 1)
+            ],
+        };
+      });
+    }, 2000);
+    // const timer = setInterval(() => {
+    //   dispatch(
+    //     sendMessageAction({
+    //       to: 'pose',
+    //       message: {
+    //         cmd: 'flag_restart',
+    //         result: { event: 'flag', result: 0, score: 0.4, image: 'base64ed' },
+    //       },
+    //     })
+    //   );
+    // }, 1000);
 
     return () => {
-      clearInterval(timer);
+      // clearInterval(timer);
+      clearInterval(avatarInterval);
     };
   }, []);
   // useEffect(() => {
@@ -743,6 +791,43 @@ export default function GamePlayFlags() {
         <Box className="game_avatar">
           <Box className="avatar" />
           <Box
+            className="avatar-distracts"
+            style={{ display: `${round === 3 ? 'flex' : 'none'}` }}
+          >
+            <img
+              src={avatarDistracts?.image}
+              alt=""
+              style={{
+                opacity: `${avatarDistracts?.number === 0 ? '1' : '0'}`,
+              }}
+            />
+            <img
+              src={avatarDistracts?.image}
+              alt=""
+              style={{
+                opacity: `${avatarDistracts?.number === 1 ? '1' : '0'}`,
+              }}
+            />
+          </Box>
+          <Box
+            className="ready"
+            style={{
+              display: `${think ? 'block' : 'none'}`,
+              animation: 'fadeIn 1s',
+            }}
+          >
+            <img
+              src={thinkPng}
+              alt=""
+              style={{
+                top: '-110px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: '400px',
+              }}
+            />
+          </Box>
+          <Box
             className="ready"
             style={{
               display: `${startGame || image === roundPng ? 'none' : 'block'}`,
@@ -786,7 +871,10 @@ export default function GamePlayFlags() {
           </Box>
           {image === roundPng ? (
             <>
-              <Box className="imgRound" style={{ animation: 'scaleInOut 2s' }}>
+              <Box
+                className="imgRound"
+                style={{ animation: 'scaleInOut 2.2s' }}
+              >
                 <img
                   src={image}
                   className="imgRound"
@@ -801,8 +889,27 @@ export default function GamePlayFlags() {
           <Box className="back" />
           <Box className="foot" />
         </Box>
-        <Box className="commands">
-          <Typography className="text-command">{textCommand}!</Typography>
+        <Box
+          className="commands"
+          style={{
+            backgroundColor: `${round > 1 ? '#000' : '#fff'}`,
+            borderColor: `${round > 1 ? '#fff' : '#000'}`,
+          }}
+        >
+          <Typography
+            className="text-command"
+            style={{
+              color: `${
+                round > 1 && textCommand !== ''
+                  ? rndColorText === 1
+                    ? 'red'
+                    : 'white'
+                  : '#000'
+              }`,
+            }}
+          >
+            {round === 3 ? '' : textCommand}!
+          </Typography>
         </Box>
         <Box className="counterProgress">
           <Typography className="number-counte">

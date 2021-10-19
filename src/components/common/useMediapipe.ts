@@ -73,7 +73,6 @@ export const useMediapipe = () => {
           cmd: 'squat_start'
         },
       }));
-
     },
     ballstrikeMode: (
       options: { attackKeypoints: string[], targets: number, targetSize: number }
