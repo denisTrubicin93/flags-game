@@ -5,7 +5,7 @@ import { addCount,  finishSubway, getCount, getMode, nextKabeanaPose, setCount, 
 import axios from 'axios';
 
 function* messageHandler(action: ReturnType<typeof messageAction>) {
-  console.log(action.payload)
+  // console.log(action.payload)
   try {
     switch (action.payload.cmd) {
       case 'event':
@@ -14,7 +14,7 @@ function* messageHandler(action: ReturnType<typeof messageAction>) {
           if (!mode) break;
 
           const result = action.payload.result;
-          console.log(result.event);
+          // console.log(result.event);
           if (result.event === MODE_SQUAT) {
             if (result.result) {
               yield put(addCount(1));
@@ -23,9 +23,10 @@ function* messageHandler(action: ReturnType<typeof messageAction>) {
             yield put(setImage(result.image));
           }
           if (result.event === MODE_FLAG) {
-
-            yield put(setNumPose(result.result));
-            yield put(setImage(result.image));
+            if (result.result !== null){
+              yield put(setNumPose(result.result));
+              yield put(setImage(result.image));
+            }
           }
           if (result.event === MODE_KABEANA) {
             if (result.result) {

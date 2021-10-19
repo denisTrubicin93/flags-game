@@ -21,7 +21,7 @@ export const socketMiddleware = (url: string, name: string = 'handtracking') => 
     socket.on('disconnected', () => store.dispatch(disconnectedAction()));
     socket.on('message', message => {
       store.dispatch(messageAction(message));
-      console.log(message);
+      // console.log(message);
     });
     socket.connect();
 

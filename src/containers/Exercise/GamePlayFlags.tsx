@@ -348,13 +348,27 @@ export default function GamePlayFlags() {
     FlagsUp,
     FlagsDown,
   ];
+  // const textCommands = {
+  //   red_up: '赤上げて',
+  //   white_up: '白上げて',
+  //   red_down: '赤下げて',
+  //   white_down: '白下げて',
+  //   flags_up: '赤白上げて',
+  //   flags_down: '赤白下げて',
+  //   red_not_up: '赤上げない',
+  //   white_not_up: '白上げない',
+  //   red_not_down: '赤下げない',
+  //   white_not_down: '白下げない',
+  //   flags_not_up: '赤白上げない',
+  //   flags_not_down: '赤白下げない',
+  // };
   const textCommands = {
-    red_up: '赤上げて',
-    white_up: '白上げて',
-    red_down: '赤下げて',
-    white_down: '白下げて',
-    flags_up: '赤白上げて',
-    flags_down: '赤白下げて',
+    red_up: 'red_up',
+    white_up: 'white_up',
+    red_down: 'red_down',
+    white_down: 'white_down',
+    flags_up: 'flags_up',
+    flags_down: 'flags_down',
     red_not_up: '赤上げない',
     white_not_up: '白上げない',
     red_not_down: '赤下げない',
@@ -372,9 +386,9 @@ export default function GamePlayFlags() {
       textCommands.white_not_up,
     ],
     flagsUp: [
-      // textCommands.red_down,
-      // textCommands.white_down,
-      // textCommands.flags_down,
+      textCommands.red_down,
+      textCommands.white_down,
+      textCommands.flags_down,
       textCommands.flags_not_down,
       textCommands.red_not_down,
       textCommands.white_not_down,
@@ -414,16 +428,29 @@ export default function GamePlayFlags() {
     const [FailSound] = useSound(FailAudio, defaultOptions);
     const [CorrectSound] = useSound(CorrectAudio, defaultOptions);
 
-    soundMap.set('赤上げて', R_UpSoundVoice);
-    soundMap.set('白上げて', W_UpSoundVoice);
-    soundMap.set('赤白上げて', RandW_UpSoundVoice);
+    // soundMap.set('赤上げて', R_UpSoundVoice);
+    // soundMap.set('白上げて', W_UpSoundVoice);
+    // soundMap.set('赤白上げて', RandW_UpSoundVoice);
+    // soundMap.set('赤白上げない', RandW_NotUpSoundVoice);
+    // soundMap.set('赤白下げて', RandW_DownSoundVoice);
+    // soundMap.set('赤白下げない', RandW_NotDownSoundVoice);
+    // soundMap.set('赤下げて', R_DownSoundVoice);
+    // soundMap.set('赤下げない', R_NotDownSoundVoice);
+    // soundMap.set('赤上げない', R_NotUpSoundVoice);
+    // soundMap.set('白下げて', W_DownSoundVoice);
+    // soundMap.set('白下げない', W_NotDownSoundVoice);
+    // soundMap.set('白上げない', W_NotUpSoundVoice);
+    // soundMap.set('白上げない', W_NotUpSoundVoice);
+    soundMap.set('red_up', R_UpSoundVoice);
+    soundMap.set('white_up', W_UpSoundVoice);
+    soundMap.set('flags_up', RandW_UpSoundVoice);
     soundMap.set('赤白上げない', RandW_NotUpSoundVoice);
-    soundMap.set('赤白下げて', RandW_DownSoundVoice);
+    soundMap.set('flags_down', RandW_DownSoundVoice);
     soundMap.set('赤白下げない', RandW_NotDownSoundVoice);
-    soundMap.set('赤下げて', R_DownSoundVoice);
+    soundMap.set('red_down', R_DownSoundVoice);
     soundMap.set('赤下げない', R_NotDownSoundVoice);
     soundMap.set('赤上げない', R_NotUpSoundVoice);
-    soundMap.set('白下げて', W_DownSoundVoice);
+    soundMap.set('white_down', W_DownSoundVoice);
     soundMap.set('白下げない', W_NotDownSoundVoice);
     soundMap.set('白上げない', W_NotUpSoundVoice);
     soundMap.set('白上げない', W_NotUpSoundVoice);
@@ -433,7 +460,7 @@ export default function GamePlayFlags() {
   };
   const soundMap = soundCommandsFlag();
 
-  const maxProgress = [5, 6, 7];
+  const maxProgress = [5, 5, 5];
   const currency = useSelector<RootState, number | undefined>(
     // (state) => console.log(state)
     (state) => state.exercise.data?.numPose
@@ -484,6 +511,7 @@ export default function GamePlayFlags() {
     }
   };
   const lossOfHeart = () => {
+    console.log('Fail')
     setImage(FlagFail);
     setTextCommand('Fail');
     const sound = soundMap.get('Fail');
@@ -505,6 +533,7 @@ export default function GamePlayFlags() {
     setTimeout(() => {
       setThink(true);
     }, 1000);
+    console.log('rndCommand', rndCommand)
     if (round === 2) setRndColorText(() => Math.round(Math.random()));
     else setRndColorText(() => 0);
     setTextCommand(() => rndCommand);
@@ -541,7 +570,11 @@ export default function GamePlayFlags() {
 
   const tick = useCallback(() => {
     if (!startGame) return;
-    if (seconds === 1 && round === 3) {
+    if (seconds <= 1 && round === 3) {
+      if (counteProgress < maxProgress[round - 1]) {
+        setFail(true);
+        return;
+      }
       dispatch(
         sendMessageAction({
           to: 'pose',
@@ -556,6 +589,7 @@ export default function GamePlayFlags() {
         dispatch(setResult('success'));
         history.push('success');
       }, 2000);
+      return;
     }
     if (seconds === 1 && round < 3) {
       if (counteProgress < maxProgress[round - 1]) {
@@ -792,7 +826,7 @@ export default function GamePlayFlags() {
           <Box className="avatar" />
           <Box
             className="avatar-distracts"
-            style={{ display: `${round === 3 ? 'flex' : 'none'}` }}
+            style={{ display: `${round === 3 && startGame ? 'flex' : 'none'}` }}
           >
             <img
               src={avatarDistracts?.image}
@@ -812,7 +846,7 @@ export default function GamePlayFlags() {
           <Box
             className="ready"
             style={{
-              display: `${think ? 'block' : 'none'}`,
+              display: `${think && startGame ? 'block' : 'none'}`,
               animation: 'fadeIn 1s',
             }}
           >
