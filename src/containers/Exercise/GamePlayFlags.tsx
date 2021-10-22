@@ -38,6 +38,7 @@ import W_NotUpVoice from './assets/flags/voiceover/white_NO_up.mp3';
 import W_UpVoice from './assets/flags/voiceover/white_up.mp3';
 import FailAudio from './assets/flags/wrong-answer.mp3';
 import CorrectAudio from './assets/flags/correct-answer.mp3';
+import readyAudio from './assets/flags/readyUp-flag-raise.mp3';
 
 import counterPointsBG from './assets/flags/counterPoints.png';
 import BackGroundPng from './assets/squat/background.png';
@@ -62,6 +63,7 @@ import arrowUp from './assets/flags/arrow-up.png';
 import readyText from './assets/flags/are-you-ready.png';
 import roundPng from './assets/flags/round.png';
 import thinkPng from './assets/flags/think.png';
+import successRound from './assets/flags/success.png';
 
 import EllipseBack from './assets/squat/ellipse_back.png';
 import EllipseFoot from './assets/squat/ellipse_foot.png';
@@ -386,9 +388,9 @@ export default function GamePlayFlags() {
       textCommands.white_not_up,
     ],
     flagsUp: [
-      textCommands.red_down,
-      textCommands.white_down,
-      textCommands.flags_down,
+      // textCommands.red_down,
+      // textCommands.white_down,
+      // textCommands.flags_down,
       textCommands.flags_not_down,
       textCommands.red_not_down,
       textCommands.white_not_down,
@@ -410,6 +412,7 @@ export default function GamePlayFlags() {
   const soundCommandsFlag = () => {
     const soundMap = new Map<string, PlayFunction>();
     const defaultOptions: HookOptions = { volume: 0.5 };
+    const [readySound] = useSound(readyAudio, defaultOptions);
     const [RandW_DownSoundVoice] = useSound(RandW_DownVoice, defaultOptions);
     const [RandW_NotDownSoundVoice] = useSound(
       RandW_NotDownVoice,
@@ -428,6 +431,7 @@ export default function GamePlayFlags() {
     const [FailSound] = useSound(FailAudio, defaultOptions);
     const [CorrectSound] = useSound(CorrectAudio, defaultOptions);
 
+
     // soundMap.set('赤上げて', R_UpSoundVoice);
     // soundMap.set('白上げて', W_UpSoundVoice);
     // soundMap.set('赤白上げて', RandW_UpSoundVoice);
@@ -441,6 +445,7 @@ export default function GamePlayFlags() {
     // soundMap.set('白下げない', W_NotDownSoundVoice);
     // soundMap.set('白上げない', W_NotUpSoundVoice);
     // soundMap.set('白上げない', W_NotUpSoundVoice);
+    soundMap.set('ready', readySound);
     soundMap.set('red_up', R_UpSoundVoice);
     soundMap.set('white_up', W_UpSoundVoice);
     soundMap.set('flags_up', RandW_UpSoundVoice);
@@ -456,11 +461,12 @@ export default function GamePlayFlags() {
     soundMap.set('白上げない', W_NotUpSoundVoice);
     soundMap.set('Fail', FailSound);
     soundMap.set('Correct', CorrectSound);
+
     return soundMap;
   };
   const soundMap = soundCommandsFlag();
 
-  const maxProgress = [5, 5, 5];
+  const maxProgress = [4, 4, 4];
   const currency = useSelector<RootState, number | undefined>(
     // (state) => console.log(state)
     (state) => state.exercise.data?.numPose
@@ -486,11 +492,13 @@ export default function GamePlayFlags() {
   const [startGame, setStartGame] = useState(false);
   const [think, setThink] = useState(false);
   const [avatarDistracts, setAvatarDistracts] = useState<any>(null);
+  const [sound, setSound] = useState('');
 
   const addCounteProgress = () => {
     if (textCommand === 'Game Over') return;
-    const sound = soundMap.get('Correct');
-    if (sound) sound();
+    setSound(() => 'Correct');
+    // const sound = soundMap.get('Correct');
+    // if (sound) sound();
     setCounteProgress((prev) => prev + 1);
     // counteProgress + 1 >= maxProgress[round - 1] ? setPoints(() => Points + round + 1) : setPoints(() => Points + round);
   };
@@ -511,13 +519,14 @@ export default function GamePlayFlags() {
     }
   };
   const lossOfHeart = () => {
-    console.log('Fail')
+    console.log('Fail');
     setImage(FlagFail);
     setTextCommand('Fail');
-    const sound = soundMap.get('Fail');
-    if (sound) {
-      sound();
-    }
+    setSound(() => 'Fail');
+    // const sound = soundMap.get('Fail');
+    // if (sound) {
+    //   sound();
+    // }
     setTimeout(() => {
       setWhiteFlag(() => 'down');
       setRedFlag(() => 'down');
@@ -528,12 +537,24 @@ export default function GamePlayFlags() {
     else setFail(true);
   };
 
+  const endRound = () => {
+    setImage(() => successRound);
+    setTimeout(() => {
+      setStartGame(false);
+      setTextCommand(() => '');
+      setWhiteFlag(() => 'down');
+      setRedFlag(() => 'down');
+      setCounteProgress(() => 0);
+      setSeconds(() => 20);
+      setRound(() => round + 1);
+    }, 2000);
+  };
+
   useEffect(() => {
     if (!startGame) return;
     setTimeout(() => {
       setThink(true);
     }, 1000);
-    console.log('rndCommand', rndCommand)
     if (round === 2) setRndColorText(() => Math.round(Math.random()));
     else setRndColorText(() => 0);
     setTextCommand(() => rndCommand);
@@ -546,9 +567,12 @@ export default function GamePlayFlags() {
       rndCommand === textCommands.flags_not_up
     ) {
       setTimeout(() => {
-        if (seconds > 2) {
+        addCounteProgress();
+        if (seconds === 0 && counteProgress >= maxProgress[round - 1]) {
+          endRound();
+        }
+        if (seconds > 0) {
           console.log(redFlag, whiteFlag, seconds);
-          addCounteProgress();
           if (redFlag === 'down' && whiteFlag === 'down')
             commandChange(flagsCommand.flagsDown);
           if (redFlag === 'up' && whiteFlag === 'up')
@@ -558,7 +582,9 @@ export default function GamePlayFlags() {
           if (redFlag === 'up' && whiteFlag === 'down')
             commandChange(flagsCommand.redUpWhiteDown);
         }
-      }, 1500);
+      }, 2000);
+    } else if (seconds === 0 && counteProgress >= maxProgress[round - 1]) {
+      endRound();
     }
   }, [rndCommand]);
 
@@ -570,7 +596,7 @@ export default function GamePlayFlags() {
 
   const tick = useCallback(() => {
     if (!startGame) return;
-    if (seconds <= 1 && round === 3) {
+    if (seconds <= 0 && round === 3) {
       if (counteProgress < maxProgress[round - 1]) {
         setFail(true);
         return;
@@ -591,22 +617,20 @@ export default function GamePlayFlags() {
       }, 2000);
       return;
     }
-    if (seconds === 1 && round < 3) {
+    if (seconds === 0 && round < 3) {
       if (counteProgress < maxProgress[round - 1]) {
         setFail(true);
         return;
       }
       setThink(false);
-      setStartGame(false);
-      setTextCommand(() => '');
-      setWhiteFlag(() => 'down');
-      setRedFlag(() => 'down');
-      setCounteProgress(() => 0);
-      setSeconds(() => 20);
-      setRound(() => round + 1);
     } else setSeconds(() => seconds - 1);
     dispatch(setBtnPoint(ButtonPoint.BLUR));
   }, [seconds]);
+
+  useEffect(() => {
+    const soundPlay = soundMap.get(sound);
+    if (soundPlay) soundPlay();
+  }, [sound]);
 
   useEffect(() => {
     if (
@@ -615,8 +639,9 @@ export default function GamePlayFlags() {
       textCommand === ''
     )
       return;
-    const sound = soundMap.get(textCommand);
-    if (sound) sound();
+    setSound(() => textCommand);
+    // const sound = soundMap.get(textCommand);
+    // if (sound) sound();
   }, [textCommand]);
 
   useEffect(() => {
@@ -642,14 +667,17 @@ export default function GamePlayFlags() {
   useEffect(() => {
     setTimeout(tick, 1000);
   }, [seconds]);
+
   useEffect(() => {
     if (startGame) {
       setSeconds(() => seconds - 1);
     }
   }, [startGame]);
+
   useEffect(() => {
     setImage(() => roundPng);
     setTimeout(() => {
+      setSound(() => 'ready');
       setImage(() => FlagStart);
       // dispatch(
       //   sendMessageAction({
@@ -680,7 +708,7 @@ export default function GamePlayFlags() {
     //       to: 'pose',
     //       message: {
     //         cmd: 'flag_restart',
-    //         result: { event: 'flag', result: 0, score: 0.4, image: 'base64ed' },
+    //         result: { event: 'flag', result: 2, score: 0.4, image: 'base64ed' },
     //       },
     //     })
     //   );
@@ -716,7 +744,9 @@ export default function GamePlayFlags() {
           setImage(() => FlagsUp);
           setWhiteFlag(() => 'up');
           setRedFlag(() => 'up');
-          commandChange(flagsCommand.flagsUp);
+          setTimeout(() => {
+            commandChange(flagsCommand.flagsUp);
+          }, 500);
           setStartGame(true);
         }
         break;
@@ -903,7 +933,7 @@ export default function GamePlayFlags() {
               }}
             />
           </Box>
-          {image === roundPng ? (
+          {image === roundPng || image === successRound ? (
             <>
               <Box
                 className="imgRound"
@@ -942,7 +972,12 @@ export default function GamePlayFlags() {
               }`,
             }}
           >
-            {round === 3 ? '' : textCommand}!
+            {!startGame && image === FlagStart
+              ? '両手を上げて'
+              : round === 3
+              ? ''
+              : textCommand}
+            !
           </Typography>
         </Box>
         <Box className="counterProgress">
