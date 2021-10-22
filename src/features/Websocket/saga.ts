@@ -21,7 +21,7 @@ export const socketMiddleware = (url: string, name: string = 'handtracking') => 
     socket.on('disconnected', () => store.dispatch(disconnectedAction()));
     socket.on('message', message => {
       // if(message.cmd === 'event') console.log('This message blocked!!!!')
-      // store.dispatch(messageAction(message));
+      store.dispatch(messageAction(message));
       console.log(message);
     });
     socket.connect();

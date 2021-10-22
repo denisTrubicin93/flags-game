@@ -388,9 +388,9 @@ export default function GamePlayFlags() {
       textCommands.white_not_up,
     ],
     flagsUp: [
-      // textCommands.red_down,
-      // textCommands.white_down,
-      // textCommands.flags_down,
+      textCommands.red_down,
+      textCommands.white_down,
+      textCommands.flags_down,
       textCommands.flags_not_down,
       textCommands.red_not_down,
       textCommands.white_not_down,
@@ -539,9 +539,9 @@ export default function GamePlayFlags() {
 
   const endRound = () => {
     setImage(() => successRound);
+    setTextCommand(() => '');
     setTimeout(() => {
       setStartGame(false);
-      setTextCommand(() => '');
       setWhiteFlag(() => 'down');
       setRedFlag(() => 'down');
       setCounteProgress(() => 0);
@@ -568,10 +568,7 @@ export default function GamePlayFlags() {
     ) {
       setTimeout(() => {
         addCounteProgress();
-        if (seconds === 0 && counteProgress >= maxProgress[round - 1]) {
-          endRound();
-        }
-        if (seconds > 0) {
+        if (seconds > 3) {
           console.log(redFlag, whiteFlag, seconds);
           if (redFlag === 'down' && whiteFlag === 'down')
             commandChange(flagsCommand.flagsDown);
@@ -582,9 +579,7 @@ export default function GamePlayFlags() {
           if (redFlag === 'up' && whiteFlag === 'down')
             commandChange(flagsCommand.redUpWhiteDown);
         }
-      }, 2000);
-    } else if (seconds === 0 && counteProgress >= maxProgress[round - 1]) {
-      endRound();
+      }, 2500);
     }
   }, [rndCommand]);
 
@@ -622,6 +617,7 @@ export default function GamePlayFlags() {
         setFail(true);
         return;
       }
+      endRound();
       setThink(false);
     } else setSeconds(() => seconds - 1);
     dispatch(setBtnPoint(ButtonPoint.BLUR));
@@ -944,7 +940,7 @@ export default function GamePlayFlags() {
                   className="imgRound"
                   style={{ width: '50%' }}
                 />
-                <Typography className="round-number">{round}</Typography>
+                <Typography className="round-number" style={{display:`${image === successRound ? 'none' : 'block'}`}}>{round}</Typography>
               </Box>
             </>
           ) : (
