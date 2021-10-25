@@ -466,8 +466,131 @@ export default function GamePlayFlags() {
   };
   const soundMap = soundCommandsFlag();
 
+  const paramsList = [
+    {
+      id: 1,
+      rf: 'down',
+      wf: 'down',
+      pose: 0,
+      img: RedUp,
+      set_rf: 'up',
+      set_wf: 'down',
+      flag_com: flagsCommand.redUpWhiteDown,
+    },
+    {
+      id: 2,
+      rf: 'down',
+      wf: 'down',
+      pose: 1,
+      img: WhiteUp,
+      set_rf: 'down',
+      set_wf: 'up',
+      flag_com: flagsCommand.redDownWhiteUp,
+    },
+    {
+      id: 3,
+      rf: 'down',
+      wf: 'down',
+      pose: 2,
+      img: FlagsUp,
+      set_rf: 'up',
+      set_wf: 'up',
+      flag_com: flagsCommand.flagsUp,
+    },
+    {
+      id: 4,
+      rf: 'down',
+      wf: 'up',
+      pose: 2,
+      img: TopRedUp,
+      set_rf: 'up',
+      set_wf: 'up',
+      flag_com: flagsCommand.flagsUp,
+    },
+    {
+      id: 5,
+      rf: 'down',
+      wf: 'up',
+      pose: 3,
+      img: WhiteDown,
+      set_rf: 'down',
+      set_wf: 'down',
+      flag_com: flagsCommand.flagsDown,
+    },
+    {
+      id: 6,
+      rf: 'down',
+      wf: 'up',
+      pose: 0,
+      img: TopWhiteDown,
+      set_rf: 'up',
+      set_wf: 'down',
+      flag_com: flagsCommand.redUpWhiteDown,
+    },
+    {
+      id: 7,
+      rf: 'up',
+      wf: 'down',
+      pose: 3,
+      img: RedDown,
+      set_rf: 'down',
+      set_wf: 'down',
+      flag_com: flagsCommand.flagsDown,
+    },
+    {
+      id: 8,
+      rf: 'up',
+      wf: 'down',
+      pose: 2,
+      img: TopWhiteUp,
+      set_rf: 'up',
+      set_wf: 'up',
+      flag_com: flagsCommand.flagsUp,
+    },
+    {
+      id: 9,
+      rf: 'up',
+      wf: 'down',
+      pose: 1,
+      img: TopRedDown,
+      set_rf: 'down',
+      set_wf: 'up',
+      flag_com: flagsCommand.redDownWhiteUp,
+    },
+    {
+      id: 10,
+      rf: 'up',
+      wf: 'up',
+      pose: 0,
+      img: TopWhiteDown,
+      set_rf: 'up',
+      set_wf: 'down',
+      flag_com: flagsCommand.redUpWhiteDown,
+    },
+    {
+      id: 11,
+      rf: 'up',
+      wf: 'up',
+      pose: 1,
+      img: TopRedDown,
+      set_rf: 'down',
+      set_wf: 'up',
+      flag_com: flagsCommand.redDownWhiteUp,
+    },
+    {
+      id: 12,
+      rf: 'up',
+      wf: 'up',
+      pose: 3,
+      img: FlagsDown,
+      set_rf: 'down',
+      set_wf: 'down',
+      flag_com: flagsCommand.flagsDown,
+    },
+  ];
+
   const maxProgress = [4, 4, 4];
-  const currency = useSelector<RootState, number | undefined>(
+  const flagPose = useSelector<RootState, number | undefined>(
     // (state) => console.log(state)
     (state) => state.exercise.data?.numPose
   );
@@ -485,7 +608,7 @@ export default function GamePlayFlags() {
   const [Points, setPoints] = useState(-1);
   const [textCommand, setTextCommand] = useState('');
   const [counteProgress, setCounteProgress] = useState(0);
-  const [fail, setFail] = useState();
+  const [fail, setFail] = useState<boolean>();
   const [image, setImage] = useState(roundPng);
   const [rndCommand, setRndCommand] = useState('');
   const [rndColorText, setRndColorText] = useState(2);
@@ -493,20 +616,19 @@ export default function GamePlayFlags() {
   const [think, setThink] = useState(false);
   const [avatarDistracts, setAvatarDistracts] = useState<any>(null);
   const [sound, setSound] = useState('');
+  const [commandNotExecute, setCommandNotExecute] = useState<number | null>();
+  const [timerRNDcommand, setTimerRNDcommand] = useState<any>();
+  const [isPaused, setIsPaused] = useState(false);
 
   const addCounteProgress = () => {
     if (textCommand === 'Game Over') return;
     setSound(() => 'Correct');
-    // const sound = soundMap.get('Correct');
-    // if (sound) sound();
     setCounteProgress((prev) => prev + 1);
-    // counteProgress + 1 >= maxProgress[round - 1] ? setPoints(() => Points + round + 1) : setPoints(() => Points + round);
   };
   const commandChange = (cm) => {
     if (seconds >= 2) {
       setTimeout(() => {
         setThink(false);
-        // const rndCommand = cm[Math.floor(Math.random() * cm.length)];
         setRndCommand(() => {
           let rnd = cm[Math.floor(Math.random() * cm.length)];
           while (rnd === rndCommand) {
@@ -514,24 +636,25 @@ export default function GamePlayFlags() {
           }
           return rnd;
         });
-        // setRndCommand(() => textCommands.red_not_up);
       }, 900);
     }
   };
   const lossOfHeart = () => {
+    setIsPaused(true);
     console.log('Fail');
     setImage(FlagFail);
     setTextCommand('Fail');
     setSound(() => 'Fail');
-    // const sound = soundMap.get('Fail');
-    // if (sound) {
-    //   sound();
-    // }
     setTimeout(() => {
+      setIsPaused(false);
+      setStartGame(false);
+      setTextCommand(() => '');
       setWhiteFlag(() => 'down');
       setRedFlag(() => 'down');
-      setImage(FlagStart);
-      commandChange(flagsCommand.flagsDown);
+      // setWhiteFlag(() => 'down');
+      // setRedFlag(() => 'down');
+      // setImage(FlagStart);
+      // commandChange(flagsCommand.flagsDown);
     }, 2000);
     if (heart > 0) setHeart(() => heart - 1);
     else setFail(true);
@@ -550,6 +673,22 @@ export default function GamePlayFlags() {
     }, 2000);
   };
 
+  const checkingForCorrectAction = (correct: boolean) => {
+    paramsList.forEach((el) => {
+      if (redFlag === el.rf && whiteFlag === el.wf && flagPose === el.pose) {
+        if (correct) {
+          setImage(() => el.img);
+          setRedFlag(() => el.set_rf);
+          setWhiteFlag(() => el.set_wf);
+          commandChange(el.flag_com);
+          addCounteProgress();
+        } else {
+          lossOfHeart();
+        }
+      }
+    });
+  };
+
   useEffect(() => {
     if (!startGame) return;
     setTimeout(() => {
@@ -566,12 +705,17 @@ export default function GamePlayFlags() {
       rndCommand === textCommands.flags_not_down ||
       rndCommand === textCommands.flags_not_up
     ) {
-      setTimeout(() => {
-        addCounteProgress();
-        if (seconds === 0 && counteProgress >= maxProgress[round - 1]) {
-          endRound();
-        }
-        if (seconds > 0) {
+      setCommandNotExecute(() => flagPose);
+    }
+  }, [rndCommand]);
+
+  useEffect(() => {
+    if (commandNotExecute === null) return;
+    if (commandNotExecute === flagPose) {
+      setTimerRNDcommand(() => {
+        setTimeout(() => {
+          setCommandNotExecute(() => null);
+          addCounteProgress();
           console.log(redFlag, whiteFlag, seconds);
           if (redFlag === 'down' && whiteFlag === 'down')
             commandChange(flagsCommand.flagsDown);
@@ -581,12 +725,13 @@ export default function GamePlayFlags() {
             commandChange(flagsCommand.redDownWhiteUp);
           if (redFlag === 'up' && whiteFlag === 'down')
             commandChange(flagsCommand.redUpWhiteDown);
-        }
-      }, 2000);
-    } else if (seconds === 0 && counteProgress >= maxProgress[round - 1]) {
-      endRound();
+        }, 2500);
+      });
+    } else {
+      setTimerRNDcommand(() => clearTimeout(timerRNDcommand));
+      lossOfHeart();
     }
-  }, [rndCommand]);
+  }, [commandNotExecute, flagPose]);
 
   useEffect(() => {
     if (counteProgress > maxProgress[round - 1])
@@ -597,6 +742,7 @@ export default function GamePlayFlags() {
   const tick = useCallback(() => {
     if (!startGame) return;
     if (seconds <= 0 && round === 3) {
+      setTimerRNDcommand(() => clearTimeout(timerRNDcommand));
       if (counteProgress < maxProgress[round - 1]) {
         setFail(true);
         return;
@@ -618,12 +764,16 @@ export default function GamePlayFlags() {
       return;
     }
     if (seconds === 0 && round < 3) {
+      setTimerRNDcommand(() => clearTimeout(timerRNDcommand));
       if (counteProgress < maxProgress[round - 1]) {
         setFail(true);
         return;
       }
+      endRound();
       setThink(false);
-    } else setSeconds(() => seconds - 1);
+    } else if (!isPaused) {
+      setSeconds(() => seconds - 1);
+    }
     dispatch(setBtnPoint(ButtonPoint.BLUR));
   }, [seconds]);
 
@@ -640,8 +790,6 @@ export default function GamePlayFlags() {
     )
       return;
     setSound(() => textCommand);
-    // const sound = soundMap.get(textCommand);
-    // if (sound) sound();
   }, [textCommand]);
 
   useEffect(() => {
@@ -671,6 +819,21 @@ export default function GamePlayFlags() {
   useEffect(() => {
     if (startGame) {
       setSeconds(() => seconds - 1);
+    }
+    if (
+      startGame === false &&
+      whiteFlag === 'down' &&
+      redFlag === 'down' &&
+      flagPose === 2 &&
+      image === FlagStart
+    ) {
+      setImage(() => FlagsUp);
+      setWhiteFlag(() => 'up');
+      setRedFlag(() => 'up');
+      setTimeout(() => {
+        commandChange(flagsCommand.flagsUp);
+      }, 500);
+      setStartGame(true);
     }
   }, [startGame]);
 
@@ -731,14 +894,16 @@ export default function GamePlayFlags() {
     goBack: () => history.push('menu'),
   });
 
+
+
   useEffect(() => {
-    if (currency === undefined || currency === null) return;
+    if (flagPose === undefined || flagPose === null) return;
     switch (textCommand) {
       case '':
         if (
           whiteFlag === 'down' &&
           redFlag === 'down' &&
-          currency === 2 &&
+          flagPose === 2 &&
           image === FlagStart
         ) {
           setImage(() => FlagsUp);
@@ -751,79 +916,39 @@ export default function GamePlayFlags() {
         }
         break;
       case textCommands.red_up:
-        if (redFlag === 'down' && whiteFlag === 'down' && currency === 0) {
-          setImage(() => RedUp);
-          setRedFlag(() => 'up');
-          commandChange(flagsCommand.redUpWhiteDown);
-          addCounteProgress();
-        } else if (redFlag === 'down' && whiteFlag === 'up' && currency === 2) {
-          setImage(() => TopRedUp);
-          setRedFlag(() => 'up');
-          commandChange(flagsCommand.flagsUp);
-          addCounteProgress();
-        } else lossOfHeart();
+        if (flagPose === 2 || flagPose === 0) {
+          checkingForCorrectAction(true);
+        } else checkingForCorrectAction(false);
         break;
       case textCommands.red_down:
-        if (redFlag === 'up' && whiteFlag === 'down' && currency === 3) {
-          setImage(() => RedDown);
-          setRedFlag(() => 'down');
-          commandChange(flagsCommand.flagsDown);
-          addCounteProgress();
-        } else if (redFlag === 'up' && whiteFlag === 'up' && currency === 1) {
-          setImage(() => TopRedDown);
-          setRedFlag(() => 'down');
-          commandChange(flagsCommand.redDownWhiteUp);
-          addCounteProgress();
-        } else lossOfHeart();
+        if (flagPose === 3 || flagPose === 1) {
+          checkingForCorrectAction(true);
+        } else checkingForCorrectAction(false);
         break;
       case textCommands.white_up:
-        if (whiteFlag === 'down' && redFlag === 'down' && currency === 1) {
-          setImage(() => WhiteUp);
-          setWhiteFlag(() => 'up');
-          commandChange(flagsCommand.redDownWhiteUp);
-          addCounteProgress();
-        } else if (whiteFlag === 'down' && redFlag === 'up' && currency === 2) {
-          setImage(() => TopWhiteUp);
-          setWhiteFlag(() => 'up');
-          commandChange(flagsCommand.flagsUp);
-          addCounteProgress();
-        } else lossOfHeart();
+        if (flagPose === 2 || flagPose === 1) {
+          checkingForCorrectAction(true);
+        } else checkingForCorrectAction(false);
         break;
       case textCommands.white_down:
-        if (whiteFlag === 'up' && redFlag === 'down' && currency === 3) {
-          setImage(() => WhiteDown);
-          commandChange(flagsCommand.flagsDown);
-          setWhiteFlag(() => 'down');
-          addCounteProgress();
-        } else if (whiteFlag === 'up' && redFlag === 'up' && currency === 0) {
-          setImage(() => TopWhiteDown);
-          setWhiteFlag(() => 'down');
-          commandChange(flagsCommand.redUpWhiteDown);
-          addCounteProgress();
-        } else lossOfHeart();
+        if (flagPose === 3 || flagPose === 0) {
+          checkingForCorrectAction(true);
+        } else checkingForCorrectAction(false);
         break;
       case textCommands.flags_up:
-        if (whiteFlag === 'down' && redFlag === 'down' && currency === 2) {
-          setImage(() => FlagsUp);
-          setWhiteFlag(() => 'up');
-          setRedFlag(() => 'up');
-          commandChange(flagsCommand.flagsUp);
-          addCounteProgress();
-        } else lossOfHeart();
+        if (flagPose === 2) {
+          checkingForCorrectAction(true);
+        } else checkingForCorrectAction(false);
         break;
       case textCommands.flags_down:
-        if (whiteFlag === 'up' && redFlag === 'up' && currency === 3) {
-          setImage(() => FlagsDown);
-          setWhiteFlag(() => 'down');
-          setRedFlag(() => 'down');
-          commandChange(flagsCommand.flagsDown);
-          addCounteProgress();
-        } else lossOfHeart();
+        if (flagPose === 3) {
+          checkingForCorrectAction(true);
+        } else checkingForCorrectAction(false);
         break;
       default:
         break;
     }
-  }, [currency]);
+  }, [flagPose]);
 
   return (
     <>
