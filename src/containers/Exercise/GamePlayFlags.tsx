@@ -1,7 +1,8 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/alt-text */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
 import {
   Box,
   Typography,
@@ -69,6 +70,7 @@ import EllipseBack from './assets/squat/ellipse_back.png';
 import EllipseFoot from './assets/squat/ellipse_foot.png';
 import useFootControl from '../../components/common/hook/useFootControl';
 import { setTimeout } from 'timers';
+import { numberLiteral } from '@babel/types';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -431,7 +433,6 @@ export default function GamePlayFlags() {
     const [FailSound] = useSound(FailAudio, defaultOptions);
     const [CorrectSound] = useSound(CorrectAudio, defaultOptions);
 
-
     // soundMap.set('赤上げて', R_UpSoundVoice);
     // soundMap.set('白上げて', W_UpSoundVoice);
     // soundMap.set('赤白上げて', RandW_UpSoundVoice);
@@ -466,8 +467,131 @@ export default function GamePlayFlags() {
   };
   const soundMap = soundCommandsFlag();
 
-  const maxProgress = [4, 4, 4];
-  const currency = useSelector<RootState, number | undefined>(
+  const paramsList = [
+    {
+      id: 1,
+      rf: 'down',
+      wf: 'down',
+      pose: 0,
+      img: RedUp,
+      set_rf: 'up',
+      set_wf: 'down',
+      flag_com: flagsCommand.redUpWhiteDown,
+    },
+    {
+      id: 2,
+      rf: 'down',
+      wf: 'down',
+      pose: 1,
+      img: WhiteUp,
+      set_rf: 'down',
+      set_wf: 'up',
+      flag_com: flagsCommand.redDownWhiteUp,
+    },
+    {
+      id: 3,
+      rf: 'down',
+      wf: 'down',
+      pose: 2,
+      img: FlagsUp,
+      set_rf: 'up',
+      set_wf: 'up',
+      flag_com: flagsCommand.flagsUp,
+    },
+    {
+      id: 4,
+      rf: 'down',
+      wf: 'up',
+      pose: 2,
+      img: TopRedUp,
+      set_rf: 'up',
+      set_wf: 'up',
+      flag_com: flagsCommand.flagsUp,
+    },
+    {
+      id: 5,
+      rf: 'down',
+      wf: 'up',
+      pose: 3,
+      img: WhiteDown,
+      set_rf: 'down',
+      set_wf: 'down',
+      flag_com: flagsCommand.flagsDown,
+    },
+    {
+      id: 6,
+      rf: 'down',
+      wf: 'up',
+      pose: 0,
+      img: TopWhiteDown,
+      set_rf: 'up',
+      set_wf: 'down',
+      flag_com: flagsCommand.redUpWhiteDown,
+    },
+    {
+      id: 7,
+      rf: 'up',
+      wf: 'down',
+      pose: 3,
+      img: RedDown,
+      set_rf: 'down',
+      set_wf: 'down',
+      flag_com: flagsCommand.flagsDown,
+    },
+    {
+      id: 8,
+      rf: 'up',
+      wf: 'down',
+      pose: 2,
+      img: TopWhiteUp,
+      set_rf: 'up',
+      set_wf: 'up',
+      flag_com: flagsCommand.flagsUp,
+    },
+    {
+      id: 9,
+      rf: 'up',
+      wf: 'down',
+      pose: 1,
+      img: TopRedDown,
+      set_rf: 'down',
+      set_wf: 'up',
+      flag_com: flagsCommand.redDownWhiteUp,
+    },
+    {
+      id: 10,
+      rf: 'up',
+      wf: 'up',
+      pose: 0,
+      img: TopWhiteDown,
+      set_rf: 'up',
+      set_wf: 'down',
+      flag_com: flagsCommand.redUpWhiteDown,
+    },
+    {
+      id: 11,
+      rf: 'up',
+      wf: 'up',
+      pose: 1,
+      img: TopRedDown,
+      set_rf: 'down',
+      set_wf: 'up',
+      flag_com: flagsCommand.redDownWhiteUp,
+    },
+    {
+      id: 12,
+      rf: 'up',
+      wf: 'up',
+      pose: 3,
+      img: FlagsDown,
+      set_rf: 'down',
+      set_wf: 'down',
+      flag_com: flagsCommand.flagsDown,
+    },
+  ];
+
+  const maxProgress = [3, 3, 3];
+  const flagPose = useSelector<RootState, number | undefined>(
     // (state) => console.log(state)
     (state) => state.exercise.data?.numPose
   );
@@ -485,7 +609,7 @@ export default function GamePlayFlags() {
   const [Points, setPoints] = useState(-1);
   const [textCommand, setTextCommand] = useState('');
   const [counteProgress, setCounteProgress] = useState(0);
-  const [fail, setFail] = useState();
+  const [fail, setFail] = useState<boolean>();
   const [image, setImage] = useState(roundPng);
   const [rndCommand, setRndCommand] = useState('');
   const [rndColorText, setRndColorText] = useState(2);
@@ -493,20 +617,22 @@ export default function GamePlayFlags() {
   const [think, setThink] = useState(false);
   const [avatarDistracts, setAvatarDistracts] = useState<any>(null);
   const [sound, setSound] = useState('');
+  const [commandNotExecute, setCommandNotExecute] = useState<number | null>();
+  const [timerRNDcommand, setTimerRNDcommand] = useState<any>();
+  const [isPaused, setIsPaused] = useState(false);
+  // const [flagPose, setFlagPose] = useState<number>();
+  const [miliSeconds, setMiliSeconds] = useState<number | null | undefined>();
+  const [checkHandsUp, setCheckHandsUp] = useState<boolean>();
 
   const addCounteProgress = () => {
     if (textCommand === 'Game Over') return;
     setSound(() => 'Correct');
-    // const sound = soundMap.get('Correct');
-    // if (sound) sound();
     setCounteProgress((prev) => prev + 1);
-    // counteProgress + 1 >= maxProgress[round - 1] ? setPoints(() => Points + round + 1) : setPoints(() => Points + round);
   };
   const commandChange = (cm) => {
     if (seconds >= 2) {
       setTimeout(() => {
         setThink(false);
-        // const rndCommand = cm[Math.floor(Math.random() * cm.length)];
         setRndCommand(() => {
           let rnd = cm[Math.floor(Math.random() * cm.length)];
           while (rnd === rndCommand) {
@@ -514,30 +640,30 @@ export default function GamePlayFlags() {
           }
           return rnd;
         });
-        // setRndCommand(() => textCommands.red_not_up);
       }, 900);
     }
   };
   const lossOfHeart = () => {
-    console.log('Fail');
+    setIsPaused(true);
     setImage(FlagFail);
     setTextCommand('Fail');
     setSound(() => 'Fail');
-    // const sound = soundMap.get('Fail');
-    // if (sound) {
-    //   sound();
-    // }
     setTimeout(() => {
+      setIsPaused(false);
+      setStartGame(false);
+      setSound(() => 'ready');
+      setTextCommand(() => '両手を上げて');
       setWhiteFlag(() => 'down');
       setRedFlag(() => 'down');
       setImage(FlagStart);
-      commandChange(flagsCommand.flagsDown);
+      // commandChange(flagsCommand.flagsDown);
     }, 2000);
     if (heart > 0) setHeart(() => heart - 1);
     else setFail(true);
   };
 
   const endRound = () => {
+    setTextCommand(() => '');
     setImage(() => successRound);
     setTextCommand(() => '');
     setTimeout(() => {
@@ -548,6 +674,25 @@ export default function GamePlayFlags() {
       setSeconds(() => 20);
       setRound(() => round + 1);
     }, 2000);
+  };
+
+  const checkingForCorrectAction = (correct: boolean) => {
+    paramsList.forEach((el) => {
+      if (redFlag === el.rf && whiteFlag === el.wf && flagPose === el.pose) {
+        console.log(el.id,el.rf,el.wf, el.pose, correct)
+        console.log( redFlag === el.rf, whiteFlag === el.wf, flagPose === el.pose, correct)
+        if (correct) {
+          setImage(() => el.img);
+          setRedFlag(() => el.set_rf);
+          setWhiteFlag(() => el.set_wf);
+          commandChange(el.flag_com);
+          addCounteProgress();
+        } else {
+          console.log('Fail!!!!')
+          lossOfHeart();
+        }
+      }
+    });
   };
 
   useEffect(() => {
@@ -566,22 +711,47 @@ export default function GamePlayFlags() {
       rndCommand === textCommands.flags_not_down ||
       rndCommand === textCommands.flags_not_up
     ) {
-      setTimeout(() => {
-        addCounteProgress();
-        if (seconds > 3) {
-          console.log(redFlag, whiteFlag, seconds);
-          if (redFlag === 'down' && whiteFlag === 'down')
-            commandChange(flagsCommand.flagsDown);
-          if (redFlag === 'up' && whiteFlag === 'up')
-            commandChange(flagsCommand.flagsUp);
-          if (redFlag === 'down' && whiteFlag === 'up')
-            commandChange(flagsCommand.redDownWhiteUp);
-          if (redFlag === 'up' && whiteFlag === 'down')
-            commandChange(flagsCommand.redUpWhiteDown);
-        }
-      }, 2500);
+      setCommandNotExecute(() => flagPose);
     }
   }, [rndCommand]);
+
+  useEffect(() => {
+    if (
+      commandNotExecute === undefined ||
+      commandNotExecute === null ||
+      textCommand === '両手を上げて' ||
+      textCommand === ''
+    )
+      return;
+    if (commandNotExecute === flagPose) {
+      setMiliSeconds(() => 2501);
+    } else {
+      setMiliSeconds(() => null);
+      lossOfHeart();
+    }
+  }, [commandNotExecute, flagPose]);
+
+  useEffect(() => {
+    if (miliSeconds === null || !miliSeconds) return;
+    if (miliSeconds === 1) {
+      setCommandNotExecute(() => null);
+      addCounteProgress();
+      if (redFlag === 'down' && whiteFlag === 'down')
+        commandChange(flagsCommand.flagsDown);
+      if (redFlag === 'up' && whiteFlag === 'up')
+        commandChange(flagsCommand.flagsUp);
+      if (redFlag === 'down' && whiteFlag === 'up')
+        commandChange(flagsCommand.redDownWhiteUp);
+      if (redFlag === 'up' && whiteFlag === 'down')
+        commandChange(flagsCommand.redUpWhiteDown);
+    } else {
+      setTimeout(() => {
+        setMiliSeconds(() => {
+          return miliSeconds - 500;
+        });
+      }, 500);
+    }
+  }, [miliSeconds]);
 
   useEffect(() => {
     if (counteProgress > maxProgress[round - 1])
@@ -592,6 +762,7 @@ export default function GamePlayFlags() {
   const tick = useCallback(() => {
     if (!startGame) return;
     if (seconds <= 0 && round === 3) {
+      setTimerRNDcommand(() => clearTimeout(timerRNDcommand));
       if (counteProgress < maxProgress[round - 1]) {
         setFail(true);
         return;
@@ -604,6 +775,7 @@ export default function GamePlayFlags() {
           },
         })
       );
+      setMiliSeconds(() => null);
       setImage(FlagSucces);
       setTimeout(() => {
         dispatch(setCount(Points));
@@ -613,13 +785,17 @@ export default function GamePlayFlags() {
       return;
     }
     if (seconds === 0 && round < 3) {
+      setTimerRNDcommand(() => clearTimeout(timerRNDcommand));
       if (counteProgress < maxProgress[round - 1]) {
         setFail(true);
         return;
       }
+      setMiliSeconds(() => null);
       endRound();
       setThink(false);
-    } else setSeconds(() => seconds - 1);
+    } else if (!isPaused) {
+      setSeconds(() => seconds - 1);
+    }
     dispatch(setBtnPoint(ButtonPoint.BLUR));
   }, [seconds]);
 
@@ -632,12 +808,12 @@ export default function GamePlayFlags() {
     if (
       textCommand === 'Fail' ||
       textCommand === 'Game Over' ||
+      textCommand === '両手を上げて' ||
       textCommand === ''
     )
       return;
+
     setSound(() => textCommand);
-    // const sound = soundMap.get(textCommand);
-    // if (sound) sound();
   }, [textCommand]);
 
   useEffect(() => {
@@ -671,21 +847,30 @@ export default function GamePlayFlags() {
   }, [startGame]);
 
   useEffect(() => {
+    if (checkHandsUp) {
+      if (flagPose === 2 && image === FlagStart) {
+        setImage(() => FlagsUp);
+        setWhiteFlag(() => 'up');
+        setRedFlag(() => 'up');
+        setTimeout(() => {
+          commandChange(flagsCommand.flagsUp);
+        }, 500);
+        setStartGame(true);
+      }
+    }
+    setCheckHandsUp(false);
+  }, [checkHandsUp]);
+
+  useEffect(() => {
     setImage(() => roundPng);
     setTimeout(() => {
       setSound(() => 'ready');
+      setTextCommand(() => '両手を上げて');
       setImage(() => FlagStart);
-      // dispatch(
-      //   sendMessageAction({
-      //     to: 'pose',
-      //     message: {
-      //       cmd: 'flag_restart',
-      //       result: { event: 'flag', result: 2, score: 0.4, image: 'base64ed' },
-      //     },
-      //   })
-      // );
+      setCheckHandsUp(true);
     }, 2000);
   }, [round]);
+
   useEffect(() => {
     const avatarInterval = setInterval(() => {
       setAvatarDistracts(() => {
@@ -698,43 +883,24 @@ export default function GamePlayFlags() {
         };
       });
     }, 2000);
-    // const timer = setInterval(() => {
-    //   dispatch(
-    //     sendMessageAction({
-    //       to: 'pose',
-    //       message: {
-    //         cmd: 'flag_restart',
-    //         result: { event: 'flag', result: 2, score: 0.4, image: 'base64ed' },
-    //       },
-    //     })
-    //   );
-    // }, 1000);
-
     return () => {
-      // clearInterval(timer);
       clearInterval(avatarInterval);
     };
   }, []);
-  // useEffect(() => {
-  //   dispatch(sendMessageAction({ to: 'pose', message: DEFAULT_COORDS }));
-  // }, []);
-
-  // const getPercent = useCallback((count: number = 0) => {
-  //   return Math.floor((100 * count) / config.target.value);
-  // }, []);
 
   useFootControl({
     goBack: () => history.push('menu'),
   });
 
   useEffect(() => {
-    if (currency === undefined || currency === null) return;
+    if (flagPose === undefined || flagPose === null) return;
     switch (textCommand) {
       case '':
+      case '両手を上げて':
         if (
           whiteFlag === 'down' &&
           redFlag === 'down' &&
-          currency === 2 &&
+          flagPose === 2 &&
           image === FlagStart
         ) {
           setImage(() => FlagsUp);
@@ -747,84 +913,58 @@ export default function GamePlayFlags() {
         }
         break;
       case textCommands.red_up:
-        if (redFlag === 'down' && whiteFlag === 'down' && currency === 0) {
-          setImage(() => RedUp);
-          setRedFlag(() => 'up');
-          commandChange(flagsCommand.redUpWhiteDown);
-          addCounteProgress();
-        } else if (redFlag === 'down' && whiteFlag === 'up' && currency === 2) {
-          setImage(() => TopRedUp);
-          setRedFlag(() => 'up');
-          commandChange(flagsCommand.flagsUp);
-          addCounteProgress();
-        } else lossOfHeart();
+        if (flagPose === 2 || flagPose === 0) {
+          checkingForCorrectAction(true);
+        } else checkingForCorrectAction(false);
         break;
       case textCommands.red_down:
-        if (redFlag === 'up' && whiteFlag === 'down' && currency === 3) {
-          setImage(() => RedDown);
-          setRedFlag(() => 'down');
-          commandChange(flagsCommand.flagsDown);
-          addCounteProgress();
-        } else if (redFlag === 'up' && whiteFlag === 'up' && currency === 1) {
-          setImage(() => TopRedDown);
-          setRedFlag(() => 'down');
-          commandChange(flagsCommand.redDownWhiteUp);
-          addCounteProgress();
-        } else lossOfHeart();
+        if (flagPose === 3 || flagPose === 1) {
+          checkingForCorrectAction(true);
+        } else checkingForCorrectAction(false);
         break;
       case textCommands.white_up:
-        if (whiteFlag === 'down' && redFlag === 'down' && currency === 1) {
-          setImage(() => WhiteUp);
-          setWhiteFlag(() => 'up');
-          commandChange(flagsCommand.redDownWhiteUp);
-          addCounteProgress();
-        } else if (whiteFlag === 'down' && redFlag === 'up' && currency === 2) {
-          setImage(() => TopWhiteUp);
-          setWhiteFlag(() => 'up');
-          commandChange(flagsCommand.flagsUp);
-          addCounteProgress();
-        } else lossOfHeart();
+        if (flagPose === 2 || flagPose === 1) {
+          checkingForCorrectAction(true);
+        } else checkingForCorrectAction(false);
         break;
       case textCommands.white_down:
-        if (whiteFlag === 'up' && redFlag === 'down' && currency === 3) {
-          setImage(() => WhiteDown);
-          commandChange(flagsCommand.flagsDown);
-          setWhiteFlag(() => 'down');
-          addCounteProgress();
-        } else if (whiteFlag === 'up' && redFlag === 'up' && currency === 0) {
-          setImage(() => TopWhiteDown);
-          setWhiteFlag(() => 'down');
-          commandChange(flagsCommand.redUpWhiteDown);
-          addCounteProgress();
-        } else lossOfHeart();
+        if (flagPose === 3 || flagPose === 0) {
+          checkingForCorrectAction(true);
+        } else checkingForCorrectAction(false);
         break;
       case textCommands.flags_up:
-        if (whiteFlag === 'down' && redFlag === 'down' && currency === 2) {
-          setImage(() => FlagsUp);
-          setWhiteFlag(() => 'up');
-          setRedFlag(() => 'up');
-          commandChange(flagsCommand.flagsUp);
-          addCounteProgress();
-        } else lossOfHeart();
+        if (flagPose === 2) {
+          checkingForCorrectAction(true);
+        } else checkingForCorrectAction(false);
         break;
       case textCommands.flags_down:
-        if (whiteFlag === 'up' && redFlag === 'up' && currency === 3) {
-          setImage(() => FlagsDown);
-          setWhiteFlag(() => 'down');
-          setRedFlag(() => 'down');
-          commandChange(flagsCommand.flagsDown);
-          addCounteProgress();
-        } else lossOfHeart();
+        if (flagPose === 3) {
+          checkingForCorrectAction(true);
+        } else checkingForCorrectAction(false);
         break;
       default:
         break;
     }
-  }, [currency]);
+  }, [flagPose]);
 
   return (
     <>
       {/* <audio src={R_UpVoice} autoPlay ></audio> */}
       <Box className={classes.app_content}>
+        {/* <Box>
+          <Button onClick={() => setFlagPose(0)} variant="contained">
+            0
+          </Button>
+          <Button onClick={() => setFlagPose(1)} variant="contained">
+            1
+          </Button>
+          <Button onClick={() => setFlagPose(2)} variant="contained">
+            2
+          </Button>
+          <Button onClick={() => setFlagPose(3)} variant="contained">
+            3
+          </Button>
+        </Box> */}
         <Box className="background">
           <Box className="base" />
         </Box>
@@ -872,7 +1012,9 @@ export default function GamePlayFlags() {
           <Box
             className="ready"
             style={{
-              display: `${think && startGame ? 'block' : 'none'}`,
+              display: `${
+                think && startGame && seconds > 0 ? 'block' : 'none'
+              }`,
               animation: 'fadeIn 1s',
             }}
           >
@@ -940,7 +1082,14 @@ export default function GamePlayFlags() {
                   className="imgRound"
                   style={{ width: '50%' }}
                 />
-                <Typography className="round-number" style={{display:`${image === successRound ? 'none' : 'block'}`}}>{round}</Typography>
+                <Typography
+                  className="round-number"
+                  style={{
+                    display: `${image === successRound ? 'none' : 'block'}`,
+                  }}
+                >
+                  {round}
+                </Typography>
               </Box>
             </>
           ) : (
