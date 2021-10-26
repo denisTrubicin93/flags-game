@@ -603,10 +603,10 @@ export default function GamePlayFlags() {
   ];
 
   const maxProgress = [3, 3, 3];
-  // const flagPose = useSelector<RootState, number | undefined>(
-  //   // (state) => console.log(state)
-  //   (state) => state.exercise.data?.numPose
-  // );
+  const flagPose = useSelector<RootState, number | undefined>(
+    // (state) => console.log(state)
+    (state) => state.exercise.data?.numPose
+  );
 
   const pose = useSelector<RootState, Pose>(getPose);
   const gender = useSelector<RootState, 'male' | 'female' | 'unknown'>(
@@ -668,10 +668,10 @@ export default function GamePlayFlags() {
       setWhiteFlag(() => 'down');
       setRedFlag(() => 'down');
       setImage(FlagStart);
+      setCheckHandsUp(true);
       // commandChange(flagsCommand.flagsDown);
     }, 2000);
-    if (heart > 0) setHeart(() => heart - 1);
-    else setFail(true);
+    setHeart(() => heart - 1);
   };
 
   const endRound = () => {
@@ -691,8 +691,14 @@ export default function GamePlayFlags() {
   const checkingForCorrectAction = (correct: boolean) => {
     paramsList.forEach((el) => {
       if (redFlag === el.rf && whiteFlag === el.wf && flagPose === el.pose) {
-        console.log(el.id,el.rf,el.wf, el.pose, correct)
-        console.log( redFlag === el.rf, whiteFlag === el.wf, flagPose === el.pose, correct)
+        console.log(el.id, el.rf, el.wf, el.pose, correct);
+        console.log(
+          redFlag === el.rf,
+          whiteFlag === el.wf,
+          flagPose === el.pose,
+          correct,
+          textCommand
+        );
         if (correct && textCommand === el.tc) {
           setImage(() => el.img);
           setRedFlag(() => el.set_rf);
@@ -700,7 +706,7 @@ export default function GamePlayFlags() {
           commandChange(el.flag_com);
           addCounteProgress();
         } else {
-          console.log('Fail!!!!')
+          console.log('Fail!!!!');
           lossOfHeart();
         }
       }
@@ -708,22 +714,35 @@ export default function GamePlayFlags() {
   };
 
   useEffect(() => {
+    if (heart === 0) setFail(true);
+  }, [heart]);
+
+  useEffect(() => {
     if (!startGame) return;
-    setTimeout(() => {
-      setThink(true);
-    }, 1000);
-    if (round === 2) setRndColorText(() => Math.round(Math.random()));
-    else setRndColorText(() => 0);
-    setTextCommand(() => rndCommand);
     if (
-      rndCommand === textCommands.red_not_up ||
-      rndCommand === textCommands.white_not_up ||
-      rndCommand === textCommands.red_not_down ||
-      rndCommand === textCommands.white_not_down ||
-      rndCommand === textCommands.flags_not_down ||
-      rndCommand === textCommands.flags_not_up
+      (redFlag === 'down' && whiteFlag === 'down' && flagPose === 3) ||
+      (redFlag === 'up' && whiteFlag === 'up' && flagPose === 2) ||
+      (redFlag === 'down' && whiteFlag === 'up' && flagPose === 1) ||
+      (redFlag === 'up' && whiteFlag === 'down' && flagPose === 0)
     ) {
-      setCommandNotExecute(() => flagPose);
+      setTimeout(() => {
+        setThink(true);
+      }, 1000);
+      if (round === 2) setRndColorText(() => Math.round(Math.random()));
+      else setRndColorText(() => 0);
+      setTextCommand(() => rndCommand);
+      if (
+        rndCommand === textCommands.red_not_up ||
+        rndCommand === textCommands.white_not_up ||
+        rndCommand === textCommands.red_not_down ||
+        rndCommand === textCommands.white_not_down ||
+        rndCommand === textCommands.flags_not_down ||
+        rndCommand === textCommands.flags_not_up
+      ) {
+        setCommandNotExecute(() => flagPose);
+      }
+    } else {
+      lossOfHeart();
     }
   }, [rndCommand]);
 
@@ -738,14 +757,16 @@ export default function GamePlayFlags() {
     if (commandNotExecute === flagPose) {
       setMiliSeconds(() => 2501);
     } else {
+      console.log('Fail rnd command!');
       setMiliSeconds(() => null);
       lossOfHeart();
     }
   }, [commandNotExecute, flagPose]);
 
   useEffect(() => {
-    if (miliSeconds === null || !miliSeconds) return;
+    if (textCommand === 'Fail' || !miliSeconds) return;
     if (miliSeconds === 1) {
+      console.log('Success!!!!');
       setCommandNotExecute(() => null);
       addCounteProgress();
       if (redFlag === 'down' && whiteFlag === 'down')
@@ -759,9 +780,9 @@ export default function GamePlayFlags() {
     } else {
       setTimeout(() => {
         setMiliSeconds(() => {
-          return miliSeconds - 500;
+          return miliSeconds - 100;
         });
-      }, 500);
+      }, 100);
     }
   }, [miliSeconds]);
 
