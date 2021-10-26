@@ -470,6 +470,7 @@ export default function GamePlayFlags() {
   const paramsList = [
     {
       id: 1,
+      tc: textCommands.red_up,
       rf: 'down',
       wf: 'down',
       pose: 0,
@@ -480,6 +481,7 @@ export default function GamePlayFlags() {
     },
     {
       id: 2,
+      tc: textCommands.white_up,
       rf: 'down',
       wf: 'down',
       pose: 1,
@@ -490,6 +492,7 @@ export default function GamePlayFlags() {
     },
     {
       id: 3,
+      tc: textCommands.flags_up,
       rf: 'down',
       wf: 'down',
       pose: 2,
@@ -500,6 +503,7 @@ export default function GamePlayFlags() {
     },
     {
       id: 4,
+      tc: textCommands.red_up,
       rf: 'down',
       wf: 'up',
       pose: 2,
@@ -510,6 +514,7 @@ export default function GamePlayFlags() {
     },
     {
       id: 5,
+      tc: textCommands.white_down,
       rf: 'down',
       wf: 'up',
       pose: 3,
@@ -520,6 +525,7 @@ export default function GamePlayFlags() {
     },
     {
       id: 6,
+      tc: '',
       rf: 'down',
       wf: 'up',
       pose: 0,
@@ -530,6 +536,7 @@ export default function GamePlayFlags() {
     },
     {
       id: 7,
+      tc: textCommands.red_down,
       rf: 'up',
       wf: 'down',
       pose: 3,
@@ -540,6 +547,7 @@ export default function GamePlayFlags() {
     },
     {
       id: 8,
+      tc: textCommands.white_up,
       rf: 'up',
       wf: 'down',
       pose: 2,
@@ -550,6 +558,7 @@ export default function GamePlayFlags() {
     },
     {
       id: 9,
+      tc: '',
       rf: 'up',
       wf: 'down',
       pose: 1,
@@ -560,6 +569,7 @@ export default function GamePlayFlags() {
     },
     {
       id: 10,
+      tc: textCommands.white_down,
       rf: 'up',
       wf: 'up',
       pose: 0,
@@ -570,6 +580,7 @@ export default function GamePlayFlags() {
     },
     {
       id: 11,
+      tc: textCommands.red_down,
       rf: 'up',
       wf: 'up',
       pose: 1,
@@ -580,6 +591,7 @@ export default function GamePlayFlags() {
     },
     {
       id: 12,
+      tc: textCommands.flags_down,
       rf: 'up',
       wf: 'up',
       pose: 3,
@@ -591,10 +603,10 @@ export default function GamePlayFlags() {
   ];
 
   const maxProgress = [3, 3, 3];
-  const flagPose = useSelector<RootState, number | undefined>(
-    // (state) => console.log(state)
-    (state) => state.exercise.data?.numPose
-  );
+  // const flagPose = useSelector<RootState, number | undefined>(
+  //   // (state) => console.log(state)
+  //   (state) => state.exercise.data?.numPose
+  // );
 
   const pose = useSelector<RootState, Pose>(getPose);
   const gender = useSelector<RootState, 'male' | 'female' | 'unknown'>(
@@ -681,7 +693,7 @@ export default function GamePlayFlags() {
       if (redFlag === el.rf && whiteFlag === el.wf && flagPose === el.pose) {
         console.log(el.id,el.rf,el.wf, el.pose, correct)
         console.log( redFlag === el.rf, whiteFlag === el.wf, flagPose === el.pose, correct)
-        if (correct) {
+        if (correct && textCommand === el.tc) {
           setImage(() => el.img);
           setRedFlag(() => el.set_rf);
           setWhiteFlag(() => el.set_wf);
